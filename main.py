@@ -6,10 +6,10 @@ from collections import OrderedDict
 from urllib import parse
 
 def Site_ON():
-    search = parse.urlparse('https://www.boannews.com/media/list.asp?mkind=1')
+    search = parse.urlparse('https://www.mk.co.kr/news/economy/')
     query=parse.parse_qs(search.query)
     S_query=parse.urlencode(query, encoding='euc-kr', doseq=True)
-    url='https://www.boannews.com/media/list.asp?{}'.format(S_query)
+    url='https://www.mk.co.kr/news/economy/{}'.format(S_query)
     Article_Crawll(url)
 
 def Article_Crawll(url):
@@ -20,8 +20,8 @@ def Article_Crawll(url):
 
     for link in soup.find_all('a', href=True):
         notices_link=link['href']
-        if '/media/view.asp?idx=' in notices_link:
-            news_link.append(notices_link)
+        if '/news/economy/view/' in notices_link:
+            news_link.append(notices_link.rstrip())
     news_link=list(OrderedDict.fromkeys(news_link))
     Compare(news_link)
 
@@ -48,14 +48,14 @@ def Maintext_Crawll(temp, cnt):
     bot=telegram.Bot(token='1412399588:AAHvqSrLUTdpwupVSAcFzlMUFKl1bPMBgpE')
     chat_id=bot.getUpdates()[-1].message.chat.id
 
-    NEW = "[+]보안뉴스 새로운 뉴스는 {}개 입니다.".format(cnt)
+    NEW = "[+]매일경제 새로운 뉴스는 {}개 입니다.".format(cnt)
     bot.sendMessage(chat_id=chat_id, text=NEW)
     for n in temp:
-        Main_URL="https://www.boannews.com{}".format(n.strip())
+        Main_URL=n.strip()
         bot.sendMessage(chat_id=chat_id, text=Main_URL)
 
     response=requests.get(Main_URL)
-    html=response.txt
+    html=response.text
     soup=BeautifulSoup(html,'html.parser')
     title=soup.find_all("div",{"id":"news_title02"})
     contents =soup.find_all("div",{"id":"news_util01"})
